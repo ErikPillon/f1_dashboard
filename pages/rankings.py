@@ -1,10 +1,10 @@
 import streamlit as st
-import pandas as pd
 import plotly.express as px
 
 from fetcher import (
     fetch_cumulative_points_by_constructor,
     fetch_cumulative_points_by_driver,
+    fetch_seasons_years,
 )
 
 st.title("F1 Dashboard")
@@ -13,7 +13,31 @@ st.markdown(
     "This dashboard displays the cumulative points for each team and driver in the 2024 F1 season."
 )
 
-df_teams = fetch_cumulative_points_by_constructor()
+championship_years = fetch_seasons_years()
+
+st.markdown(championship_years.idxmax()[0] + 1)
+
+year_selected = st.selectbox(
+    "Select championship year",
+    championship_years["year"],
+    index=int(championship_years.idxmax()[0]),
+)
+
+df_teams = fetch_cumulative_points_by_constructor(year=year_selected)
+df_drivers = fetch_cumulative_points_by_driver(year=year_selected)
+
+st.markdown(f"""
+            **Championship year: {year_selected}**
+            
+            The **{year_selected}** F1 season is the {year_selected - 1950 +1}th year of the Formula 1 Championship.
+            Saw the participation of {df_teams["name"].unique().shape[0]} teams and {df_drivers["code"].unique().shape[0]} drivers in the season.
+            """)
+
+if not year_selected == int(championship_years.max()):
+    st.markdown("""
+            _This championship is already over._
+            """)
+
 # st.dataframe(df_teams)
 
 teams_selected = st.multiselect("Select team", df_teams["name"].unique())
@@ -46,7 +70,6 @@ st.markdown("""
 
     Select a driver (resp. multiple drivers) below to see its (resp. their) points progression in the 2024 F1 season.""")
 
-df_drivers = fetch_cumulative_points_by_driver()
 
 driver_selected = st.multiselect("Select driver", df_drivers["code"].unique())
 

@@ -57,6 +57,17 @@ def fetch_cumulative_points_by_driver(year: int = 2024):
     return fetch_data_from_query(engine, query)
 
 
+@st.cache_data
+def fetch_seasons_years():
+    query = """
+    SELECT 
+        DISTINCT(year) as year
+    FROM 
+        seasons;
+    """
+    return fetch_data_from_query(engine, query)
+
+
 def fetch_data_from_query(engine, query: str):
     with engine.connect() as connection:
         df = pd.read_sql(query, connection)
