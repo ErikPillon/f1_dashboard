@@ -15,8 +15,6 @@ st.markdown(
 
 championship_years = fetch_seasons_years()
 
-st.markdown(championship_years.idxmax()[0] + 1)
-
 year_selected = st.selectbox(
     "Select championship year",
     championship_years["year"],

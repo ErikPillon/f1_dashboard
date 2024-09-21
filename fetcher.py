@@ -63,8 +63,54 @@ def fetch_seasons_years():
     SELECT 
         DISTINCT(year) as year
     FROM 
-        seasons;
+        seasons
+    ORDER BY
+        year DESC;
     """
+    return fetch_data_from_query(engine, query)
+
+
+def fetch_championship_gp(year: int) -> pd.DataFrame:
+    """given a year return the list of races"""
+    query = f"""
+    SELECT
+        r.round as round,
+        r.date as date,
+        r.url as url,
+        r.name as name,
+        c.name as circuit,
+        c.location as location,
+        c.country as country
+    FROM
+        races r
+    JOIN 
+        circuits c ON r.circuitId = c.circuitId
+    WHERE
+        r.year = {year}
+    """
+    return fetch_data_from_query(engine, query)
+
+
+@st.cache_data
+def fetch_gp_laps(year: int, round: int) -> pd.DataFrame:
+    """given a year and round return the list of races"""
+    query = f"""
+        SELECT 
+            lt.lap, 
+            lt.position, 
+            lt.milliseconds, 
+            d.code
+        FROM 
+            `lapTimes` lt 
+        JOIN 
+            drivers d on d.`driverId`=lt.`driverId` 
+        JOIN 
+            races r on r.`raceId` = lt.`raceId` 
+        WHERE 
+            r.year = {year} 
+        AND 
+            r.round = {round};
+        """
     return fetch_data_from_query(engine, query)
 
 
@@ -80,6 +126,7 @@ def fetch_number_of_wins_by_driver():
     return fetch_data_from_query(engine, query)
 
 
+@st.cache_data
 def fetch_laps_led_by_driver(year: int = 2024):
     query = f"""
         WITH laps_led_per_driver_CTE AS (
@@ -110,6 +157,7 @@ def fetch_laps_led_by_driver(year: int = 2024):
     return fetch_data_from_query(engine, query)
 
 
+@st.cache_data
 def fetch_fastest_laps_by_driver(year: int = 2024):
     query = f"""
         WITH fastest_laps_by_driver_CTE AS (
@@ -140,6 +188,7 @@ def fetch_fastest_laps_by_driver(year: int = 2024):
     return fetch_data_from_query(engine, query)
 
 
+@st.cache_data
 def fetch_number_of_laps_completed_by_driver(year: int = 2024):
     query = f"""
     WITH laps_per_driver_CTE AS (
@@ -169,11 +218,12 @@ def fetch_number_of_laps_completed_by_driver(year: int = 2024):
     return fetch_data_from_query(engine, query)
 
 
+@st.cache_data
 def fetch_number_of_world_titles_by_driver():
-    pass
+    return pd.DataFrame()
 
 
-def fetch_data_from_query(engine, query: str):
+def fetch_data_from_query(engine, query: str) -> pd.DataFrame:
     with engine.connect() as connection:
         df = pd.read_sql(query, connection)
     return df
