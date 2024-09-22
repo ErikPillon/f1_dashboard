@@ -1,8 +1,8 @@
 import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
+from colors import Colors
 
 from fetcher import fetch_seasons_years, fetch_championship_gp, fetch_gp_laps
+from viz_utils.line_plots import plot_race_progression
 
 st.title("Race Analysis")
 
@@ -44,60 +44,9 @@ st.markdown("""
     Select a driver (resp. multiple drivers) below to see its (resp. their) race pace progression over the GP.""")
 
 
-driver_selected = st.multiselect("Select driver", laps["code"].unique())
-
-
-def plot_race_progression(df: pd.DataFrame) -> go.Figure:
-    """
-    Create a Plotly line plot to show the race progression for multiple drivers.
-
-    Parameters:
-    df (pd.DataFrame): A DataFrame containing columns 'round', 'driver', and 'position'.
-
-    Returns:
-    fig: A Plotly figure object.
-    """
-
-    assert "code" in df.columns, "The DataFrame must contain a 'code' column"
-    assert "lap" in df.columns, "The DataFrame must contain a 'lap' column"
-    assert "position" in df.columns, "The DataFrame must contain a 'position' column"
-
-    # Create the figure object
-    fig = go.Figure()
-
-    drivers = df["code"].unique()
-
-    # Plot each driver as a separate line
-    for driver in drivers:
-        driver_data = df[df["code"] == driver]
-        fig.add_trace(
-            go.Scatter(
-                x=driver_data["lap"],
-                y=driver_data["position"],
-                mode="lines+markers",
-                name=driver,
-                line_shape="linear",
-            )
-        )
-
-    # Invert the y-axis to show 1st position at the top
-    fig.update_yaxes(autorange="reversed")
-
-    # Update the layout for the chart
-    # fig.update_layout(
-    #     title="Championship Standings Progression",
-    #     xaxis_title="Round",
-    #     yaxis_title="Championship Position",
-    #     legend_title="Driver",
-    #     hovermode="x unified",
-    #     plot_bgcolor="rgba(240,240,240,0.8)",  # Light background similar to the image
-    #     font=dict(size=12),
-    # )
-
-    # Show the plot
-    return fig
-
-
-fig = plot_race_progression(laps)
+colors = Colors(year=year_selected, round=round_selected)
+fig = plot_race_progression(laps, colors=colors)
 
 st.plotly_chart(fig)
+
+# driver_selected = st.multiselect("Select driver", laps["code"].unique())
