@@ -1,4 +1,4 @@
-from fetcher import fetch_drivers_by_year, fetch_seasons_years
+from fetcher import fetch_drivers_by_year
 import fastf1 as ff1
 from fastf1 import plotting
 import streamlit as st
@@ -62,7 +62,7 @@ class Colors:
 
     @classmethod
     def get_team_color(cls, team_name: str) -> str:
-        return Exception
+        return cls._TEAM_COLORS.get(team_name, None)
 
     @classmethod
     def get_team_colors(cls) -> str:
@@ -79,5 +79,4 @@ class Colors:
 
 if __name__ == "__main__":
     colors = Colors(2024)
-    breakpoint()
     print(colors)
