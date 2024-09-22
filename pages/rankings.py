@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.express as px
+from colors import Colors
 
 from fetcher import (
     fetch_cumulative_points_by_constructor,
@@ -15,13 +16,12 @@ st.markdown(
 
 championship_years = fetch_seasons_years()
 
-st.markdown(championship_years.idxmax()[0] + 1)
-
 year_selected = st.selectbox(
     "Select championship year",
     championship_years["year"],
     index=int(championship_years.idxmax()[0]),
 )
+colors = Colors(year=year_selected)
 
 df_teams = fetch_cumulative_points_by_constructor(year=year_selected)
 df_drivers = fetch_cumulative_points_by_driver(year=year_selected)
@@ -40,7 +40,9 @@ if not year_selected == int(championship_years.max()):
 
 # st.dataframe(df_teams)
 
-teams_selected = st.multiselect("Select team", df_teams["name"].unique())
+teams_selected = st.multiselect(
+    "Select team", df_teams["name"].unique(), default=df_teams["name"].unique()
+)
 
 
 fig = px.line(
@@ -48,6 +50,7 @@ fig = px.line(
     x="round",
     y="cumulative_points",
     color="name",
+    color_discrete_map=colors.get_team_colors(),
     title="Cumulative Points by Team (2024 Season)",
     labels={"round": "Round", "cumulative_points": "Cumulative Points", "name": "Team"},
     markers=True,  # Adds markers for each data point
@@ -71,13 +74,16 @@ st.markdown("""
     Select a driver (resp. multiple drivers) below to see its (resp. their) points progression in the 2024 F1 season.""")
 
 
-driver_selected = st.multiselect("Select driver", df_drivers["code"].unique())
+driver_selected = st.multiselect(
+    "Select driver", df_drivers["code"].unique(), default=df_drivers["code"].unique()
+)
 
 fig = px.line(
     df_drivers[df_drivers["code"].isin(driver_selected)],
     x="round",
     y="cumulative_points",
     color="code",
+    color_discrete_map=colors.get_driver_colors(),
     title="Cumulative Points by Driver (2024 Season)",
     labels={
         "round": "Round",
