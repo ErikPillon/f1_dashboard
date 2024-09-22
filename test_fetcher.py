@@ -9,6 +9,7 @@ from .fetcher import (
     fetch_data_from_query,
     fetch_cumulative_points_by_constructor,
     fetch_cumulative_points_by_driver,
+    fetch_drivers_by_year,
 )
 
 import os
@@ -47,6 +48,12 @@ def test_fetch_cumulative_points_by_constructor(year):
 @pytest.mark.parametrize("year", [year for year in range(1955, 2025)])
 def test_fetch_cumulative_points_by_driver(year):
     data = fetch_cumulative_points_by_driver(year=year)
+    assert not data.empty
+
+
+@pytest.mark.parametrize("year", [year for year in range(1955, 2025)])
+def test_fetch_drivers_by_year(year):
+    data = fetch_drivers_by_year(year=year)
     assert not data.empty
 
 

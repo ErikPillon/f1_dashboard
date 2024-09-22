@@ -15,6 +15,26 @@ engine = create_engine(DATABASE_URL)
 
 
 @st.cache_data
+def fetch_drivers_by_year(year: int = 2024):
+    query = f"""
+    SELECT 
+        drivers.code,
+        constructors.name
+    FROM 
+        results 
+    JOIN 
+        drivers on drivers.`DriverId` = results.`driverId` 
+    JOIN 
+        constructors on results.`constructorId` = constructors.`constructorId` 
+    join 
+        races on races.`raceId` = results.`raceId` 
+    where 
+        races.year = {year};
+    """
+    return fetch_data_from_query(engine, query)
+
+
+@st.cache_data
 def fetch_cumulative_points_by_constructor(year: int = 2024):
     query = f"""
     SELECT 
