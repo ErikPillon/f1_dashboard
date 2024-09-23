@@ -1,11 +1,10 @@
 import pytest
-from .fetcher import fetch_seasons_years, fetch_championship_gp, fetch_gp_laps
+from fetcher import fetch_seasons_years, fetch_championship_gp, fetch_gp_laps
 import pandas as pd
 import pytest
-import pandas as pd
 
 # from fixtures import db_engine
-from .fetcher import (
+from ..fetcher import (
     fetch_data_from_query,
     fetch_cumulative_points_by_constructor,
     fetch_cumulative_points_by_driver,

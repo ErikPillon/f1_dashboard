@@ -1,4 +1,4 @@
-from .colors import Colors
+from colors import Colors
 
 # tests/test_colors.py
 import pytest
